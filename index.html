@@ -12,7 +12,7 @@
         <h1>Panel de Control Financiero</h1>
 
         <!-- Sección de Balance General -->
-        <section class="balance-section card">
+        <section id="balance-section" class="balance-section card">
             <h2>Balance General</h2>
             <div class="balance-details">
                 <div>
@@ -44,7 +44,7 @@
                             <label for="income-amount">Monto (S/.)</label>
                             <input type="number" id="income-amount" placeholder="0.00" step="0.01" min="0" required>
                         </div>
-                        <button class="btn plus">Agregar Ingreso</button>
+                        <button type="submit" class="btn plus">Agregar Ingreso</button>
                     </form>
                 </section>
                 <section class="card">
@@ -69,7 +69,7 @@
                             <label for="expense-amount">Monto (S/.)</label>
                             <input type="number" id="expense-amount" placeholder="0.00" step="0.01" min="0" required>
                         </div>
-                        <button class="btn minus">Agregar Gasto</button>
+                        <button type="submit" class="btn minus">Agregar Gasto</button>
                     </form>
                 </section>
             </div>
@@ -102,24 +102,9 @@
                         <div class="filters">
                             <select id="filter-month">
                                 <option value="">Mes (Todos)</option>
-                                <option value="1">Enero</option>
-                                <option value="2">Febrero</option>
-                                <option value="3">Marzo</option>
-                                <option value="4">Abril</option>
-                                <option value="5">Mayo</option>
-                                <option value="6">Junio</option>
-                                <option value="7">Julio</option>
-                                <option value="8">Agosto</option>
-                                <option value="9">Septiembre</option>
-                                <option value="10">Octubre</option>
-                                <option value="11">Noviembre</option>
-                                <option value="12">Diciembre</option>
                             </select>
                             <select id="filter-year">
                                 <option value="">Año (Todos)</option>
-                                <option value="2024">2024</option>
-                                <option value="2025">2025</option>
-                                <option value="2026">2026</option>
                             </select>
                         </div>
                     </div>
@@ -128,8 +113,6 @@
             </div>
         </main>
     </div>
-
-    <script src="app.js"></script>
 
     <!-- Modal de Edición -->
     <div id="edit-modal" class="modal">
@@ -144,7 +127,7 @@
                     <input type="text" id="edit-description" required>
                 </div>
 
-                <div id="edit-expense-fields">
+                <div id="edit-expense-fields" style="display: none;">
                     <div class="form-control">
                         <label for="edit-category">Categoría</label>
                         <select id="edit-category"></select>
@@ -170,5 +153,8 @@
             </form>
         </div>
     </div>
+
+    <!-- App principal (ES Modules) -->
+    <script type="module" src="frontend/src/main.js"></script>
 </body>
 </html>
