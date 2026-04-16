@@ -5,6 +5,9 @@
 
 require('dotenv').config();
 const { Pool } = require('pg');
+const logger = require('../utils/logger');
+
+const log = logger.createLogger('Database');
 
 // Configuración del pool de conexiones
 const pool = new Pool({
@@ -22,7 +25,18 @@ const pool = new Pool({
 
 // Manejo de errores de conexión
 pool.on('error', (err, client) => {
-    console.error('Error inesperado en el pool de PostgreSQL:', err.message);
+    log.error('Error inesperado en el pool de PostgreSQL', {
+        error: err.message,
+        code: err.code
+    });
+});
+
+pool.on('connect', () => {
+    log.debug('Nueva conexión establecida al pool');
+});
+
+pool.on('acquire', () => {
+    log.debug('Cliente adquirido del pool');
 });
 
 /**
@@ -36,10 +50,22 @@ const query = async (text, params) => {
     try {
         const result = await pool.query(text, params);
         const duration = Date.now() - start;
-        console.log(`Query ejecutada en ${duration}ms: ${text.substring(0, 50)}...`);
+        
+        log.debug('Query ejecutada', {
+            duration: `${duration}ms`,
+            rows: result.rowCount,
+            query: text.substring(0, 100)
+        });
+        
         return result;
     } catch (error) {
-        console.error(`Error en query: ${text.substring(0, 50)}...`, error.message);
+        const duration = Date.now() - start;
+        log.error('Error en query', {
+            duration: `${duration}ms`,
+            query: text.substring(0, 100),
+            error: error.message,
+            code: error.code
+        });
         throw error;
     }
 };
@@ -49,7 +75,9 @@ const query = async (text, params) => {
  * @returns {Promise<Object>} Cliente de PostgreSQL
  */
 const getClient = async () => {
+    log.debug('Solicitando cliente del pool');
     const client = await pool.connect();
+    log.debug('Cliente obtenido');
     return client;
 };
 
@@ -58,8 +86,9 @@ const getClient = async () => {
  * Usar al cerrar la aplicación
  */
 const closePool = async () => {
+    log.info('Cerrando pool de PostgreSQL');
     await pool.end();
-    console.log('Pool de PostgreSQL cerrado');
+    log.success('Pool de PostgreSQL cerrado');
 };
 
 module.exports = {
