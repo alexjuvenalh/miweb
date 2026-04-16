@@ -59,6 +59,13 @@
                             <select id="expense-category" required></select>
                         </div>
                         <div class="form-control">
+                            <label for="expense-type">Tipo de Gasto</label>
+                            <select id="expense-type" required>
+                                <option value="variable">Gasto Variable</option>
+                                <option value="fijo">Gasto Fijo</option>
+                            </select>
+                        </div>
+                        <div class="form-control">
                             <label for="expense-amount">Monto (S/.)</label>
                             <input type="number" id="expense-amount" placeholder="0.00" step="0.01" min="0" required>
                         </div>
@@ -70,13 +77,19 @@
             <!-- Columna de Gráfico y Resumen -->
             <div class="column">
                 <section class="card">
-                    <h2>Distribución de Gastos</h2>
+                    <h2>Distribución por Categoría</h2>
                     <div class="chart-container">
                         <canvas id="expense-chart"></canvas>
                     </div>
                 </section>
                 <section class="card">
-                    <h2>Resumen por Categoría</h2>
+                    <h2>Distribución Fijo vs Variable</h2>
+                    <div class="chart-container">
+                        <canvas id="type-chart"></canvas>
+                    </div>
+                </section>
+                <section class="card">
+                    <h2>Resumen</h2>
                     <div id="summary-container"></div>
                 </section>
             </div>
@@ -84,7 +97,32 @@
             <!-- Columna del Historial -->
             <div class="column">
                 <section class="card">
-                    <h2>Historial de Transacciones</h2>
+                    <div class="flex-between">
+                        <h2>Historial</h2>
+                        <div class="filters">
+                            <select id="filter-month">
+                                <option value="">Mes (Todos)</option>
+                                <option value="1">Enero</option>
+                                <option value="2">Febrero</option>
+                                <option value="3">Marzo</option>
+                                <option value="4">Abril</option>
+                                <option value="5">Mayo</option>
+                                <option value="6">Junio</option>
+                                <option value="7">Julio</option>
+                                <option value="8">Agosto</option>
+                                <option value="9">Septiembre</option>
+                                <option value="10">Octubre</option>
+                                <option value="11">Noviembre</option>
+                                <option value="12">Diciembre</option>
+                            </select>
+                            <select id="filter-year">
+                                <option value="">Año (Todos)</option>
+                                <option value="2024">2024</option>
+                                <option value="2025">2025</option>
+                                <option value="2026">2026</option>
+                            </select>
+                        </div>
+                    </div>
                     <div id="history-list"></div>
                 </section>
             </div>
@@ -92,5 +130,45 @@
     </div>
 
     <script src="app.js"></script>
+
+    <!-- Modal de Edición -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content card">
+            <h2>Editar Transacción</h2>
+            <form id="edit-form">
+                <input type="hidden" id="edit-id">
+                <input type="hidden" id="edit-type">
+                
+                <div class="form-control">
+                    <label for="edit-description">Descripción</label>
+                    <input type="text" id="edit-description" required>
+                </div>
+
+                <div id="edit-expense-fields">
+                    <div class="form-control">
+                        <label for="edit-category">Categoría</label>
+                        <select id="edit-category"></select>
+                    </div>
+                    <div class="form-control">
+                        <label for="edit-expense-type">Tipo de Gasto</label>
+                        <select id="edit-expense-type">
+                            <option value="variable">Gasto Variable</option>
+                            <option value="fijo">Gasto Fijo</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-control">
+                    <label for="edit-amount">Monto (S/.)</label>
+                    <input type="number" id="edit-amount" step="0.01" min="0" required>
+                </div>
+
+                <div class="modal-buttons">
+                    <button type="button" id="cancel-edit" class="btn">Cancelar</button>
+                    <button type="submit" class="btn plus">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
 </html>
