@@ -1,16 +1,19 @@
 {
   "name": "financiero",
   "version": "1.0.0",
-  "description": "",
-  "main": "app.js",
+  "description": "Aplicacion de control financiero personal",
+  "main": "backend/src/app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node backend/src/app.js",
+    "dev": "node backend/src/app.js",
+    "test": "echo \"No tests yet\" && exit 0",
+    "migrate": "psql -U postgres -d control_financiero -f migrations/001_create_transactions.sql"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/alexjuvenalh/miweb.git"
   },
-  "keywords": [],
+  "keywords": ["finanzas", "budget", "control"],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
