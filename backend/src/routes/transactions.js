@@ -35,6 +35,10 @@ router.get('/', validateQuery(filterSchema), async (req, res, next) => {
         if (month && year) {
             query += ' WHERE EXTRACT(MONTH FROM created_at) = $1 AND EXTRACT(YEAR FROM created_at) = $2';
             params.push(month, year);
+        } else if (month) {
+            // Solo mes (sin año)
+            query += ' WHERE EXTRACT(MONTH FROM created_at) = $1';
+            params.push(month);
         } else if (year) {
             query += ' WHERE EXTRACT(YEAR FROM created_at) = $1';
             params.push(year);

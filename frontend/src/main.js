@@ -63,24 +63,27 @@ class App {
     
     /**
      * Carga las transacciones desde la API
+     * @param {Object} filters - Filtros opcionales (si no se pasa, obtiene del componente)
      */
-    async loadTransactions() {
-        if (this.loading) return;
-        
-        this.loading = true;
+    async loadTransactions(filters = null) {
         store.setState({ loading: true, error: null });
-        
+
         try {
-            const filters = this.filters.getFilters();
+            // Usar filtros pasados o obtener del componente
+            if (!filters) {
+                filters = this.filters.getFilters();
+            }
+            console.log('Loading with filters:', JSON.stringify(filters));
             const transactions = await api.getTransactions(filters);
-            
+
+            console.log('API returned:', transactions.length, 'transactions');
             store.setState({ transactions, loading: false });
             this.updateUI();
         } catch (err) {
             console.error('Error al cargar transacciones:', err);
-            store.setState({ 
-                loading: false, 
-                error: 'Error al cargar transacciones. Verifique que el servidor esté corriendo.' 
+            store.setState({
+                loading: false,
+                error: 'Error al cargar transacciones. Verifique que el servidor esté corriendo.'
             });
             alert('Error al cargar transacciones: ' + err.message);
         }
@@ -173,11 +176,13 @@ class App {
     
     /**
      * Maneja el cambio de filtros
-     * @param {Object} filters 
+     * @param {Object} filters
      */
     handleFilterChange(filters) {
+        console.log('Filter change:', JSON.stringify(filters));
         store.setFilters(filters);
-        this.loadTransactions();
+        // IMPORTANTE: pasar los filtros directamente, no llamarlos otra vez
+        this.loadTransactions(filters);
     }
 }
 
