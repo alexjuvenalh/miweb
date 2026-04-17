@@ -73,10 +73,7 @@ class App {
             if (!filters) {
                 filters = this.filters.getFilters();
             }
-            console.log('Loading with filters:', JSON.stringify(filters));
             const transactions = await api.getTransactions(filters);
-
-            console.log('API returned:', transactions.length, 'transactions');
             store.setState({ transactions, loading: false });
             this.updateUI();
         } catch (err) {
@@ -179,9 +176,7 @@ class App {
      * @param {Object} filters
      */
     handleFilterChange(filters) {
-        console.log('Filter change:', JSON.stringify(filters));
         store.setFilters(filters);
-        // IMPORTANTE: pasar los filtros directamente, no llamarlos otra vez
         this.loadTransactions(filters);
     }
 }
