@@ -138,7 +138,25 @@ showLogin() {
         if (logoutBtn && currentUser) {
             logoutBtn.style.display = 'inline-block';
             logoutBtn.onclick = async () => {
+                console.log('Cerrando sesión...');
                 await window.FirebaseAuth.logout();
+                
+                // Limpiar datos del usuario
+                currentUser = null;
+                
+                // Limpiar UI
+                const userNameEl = document.getElementById('user-name');
+                if (userNameEl) userNameEl.textContent = '';
+                
+                const userPhotoEl = document.getElementById('user-photo');
+                if (userPhotoEl) {
+                    userPhotoEl.src = '';
+                    userPhotoEl.alt = 'Usuario';
+                }
+                
+                // Mostrar login
+                this.showLogin();
+                console.log('Sesión cerrada, mostrando login');
             };
             
             // Mostrar nombre del usuario
