@@ -5,11 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Control Financiero</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Firebase SDK desde CDN -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <!-- Firebase Auth -->
+    <script src="frontend/src/firebase.js"></script>
+    <!-- Meta para popups -->
+    <meta name="referrer" content="no-referrer-when-downgrade">
 </head>
 <body>
-    <div class="container">
-        <h1>Panel de Control Financiero</h1>
+    <!-- Pantalla de Login -->
+    <div id="login-container" class="login-screen">
+        <div class="login-card">
+            <h1>Control Financiero</h1>
+            <p class="login-subtitle">Gestiona tus finanzas personales</p>
+            <button id="google-login-btn" class="btn-google">
+                <img src="https://www.gstatic.com/images/branding/googleg/1x/googleg_standard_color.svg" alt="Google">
+                Continuar con Google
+            </button>
+        </div>
+    </div>
+
+    <!-- Contenedor Principal de la App -->
+    <div id="app-container" class="container" style="display: none;">
+        <div class="header-user">
+            <h1>Panel de Control Financiero</h1>
+            <div class="user-info">
+                <img id="user-photo" class="user-photo" src="" alt="Usuario">
+                <span id="user-name"></span>
+                <button id="logout-btn" class="btnlogout">Cerrar Sesión</button>
+            </div>
+        </div>
 
         <!-- Sección de Balance General -->
         <section id="balance-section" class="balance-section card">
@@ -152,6 +180,8 @@
                 </div>
             </form>
         </div>
+    </div>
+
     </div>
 
     <!-- App principal (ES Modules) -->

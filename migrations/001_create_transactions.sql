@@ -58,9 +58,12 @@ CREATE INDEX IF NOT EXISTS idx_transactions_type
 CREATE INDEX IF NOT EXISTS idx_transactions_category 
     ON transactions(category);
 
--- Indice compuesto para filtros por mes/ano
-CREATE INDEX IF NOT EXISTS idx_transactions_year_month 
-    ON transactions(EXTRACT(YEAR FROM created_at), EXTRACT(MONTH FROM created_at));
+-- Indice compuesto para filtros por mes/ano (usando columnas calculadas)
+-- NOTA: Por now we use expression index on text cast to avoid IMMUTABLE issue
+-- Alternatively, add year/month columns to the table
+-- CREATE INDEX IF NOT EXISTS idx_transactions_year_month
+--     ON transactions(EXTRACT(YEAR FROM created_at), EXTRACT(MONTH FROM created_at));
+-- We'll rely on idx_transactions_created_at for date sorting
 
 -- ============================================================
 -- Trigger para actualizar updated_at automaticamente

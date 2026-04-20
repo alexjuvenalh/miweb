@@ -13,6 +13,9 @@ import SummaryComponent from './components/SummaryComponent.js';
 import EditModalComponent from './components/EditModalComponent.js';
 import FilterComponent from './components/FilterComponent.js';
 
+// Estado de autenticación
+let currentUser = null;
+
 class App {
     constructor() {
         // Componentes
@@ -28,17 +31,147 @@ class App {
         this.loading = false;
     }
     
+/**
+ * Inicializa la aplicación
+ */
+async init() {
+    console.log('Inicializando aplicación...');
+    this.showLogin();
+    await window.FirebaseAuth.init();
+    console.log('Firebase inicializado');
+    
+    const onLoggedIn = (user) => {
+        if (user) {
+            console.log('LOGIN EXITOSO:', user.displayName);
+            currentUser = user;
+            this.hideLogin();
+            this.startApp();
+            return true;
+        }
+        return false;
+    };
+    
+    window.FirebaseAuth.onAuthStateChanged((user) => {
+        console.log('Auth changed:', user ? user.displayName : 'null');
+        onLoggedIn(user);
+    });
+    
+    const user = window.FirebaseAuth.getCurrentUser();
+    if (onLoggedIn(user)) return;
+    
+    console.log('Mostrando login');
+    this.showLogin();
+}
+
+/**
+ * Muestra la pantalla de login
+ */
+showLogin() {
+    const appContainer = document.getElementById('app-container');
+    const loginContainer = document.getElementById('login-container');
+    
+    if (appContainer) appContainer.style.display = 'none';
+    if (loginContainer) loginContainer.style.display = 'flex';
+        
+        // Re-habilitar botón de login
+        const loginBtn = document.getElementById('google-login-btn');
+        if (loginBtn) {
+            loginBtn.innerHTML = '<img src="https://www.gstatic.com/images/branding/googleg/1x/googleg_standard_color.svg" alt="Google"> Continuar con Google';
+            loginBtn.disabled = false;
+            
+            // Remover eventos previos
+            loginBtn.onclick = null;
+            
+            loginBtn.onclick = async () => {
+                console.log('CLICK EN BOTON LOGIN');
+                console.log('FirebaseAuth disponible:', typeof window.FirebaseAuth);
+                
+                loginBtn.innerHTML = 'Iniciando sesión...';
+                loginBtn.disabled = true;
+                
+                try {
+                    console.log('Llamando loginWithGoogle...');
+                    const user = await window.FirebaseAuth.loginWithGoogle();
+                    console.log('Login completado:', user);
+                } catch (err) {
+                    console.error('Error de login:', err);
+                    alert('Error al iniciar sesión: ' + err.message);
+                    loginBtn.innerHTML = '<img src="https://www.gstatic.com/images/branding/googleg/1x/googleg_standard_color.svg" alt="Google"> Continuar con Google';
+                    loginBtn.disabled = false;
+                }
+            };
+        }
+    }
+    
     /**
-     * Inicializa la aplicación
+     * Oculta la pantalla de login
      */
-    init() {
-        console.log('Inicializando aplicación...');
+    hideLogin() {
+        const appContainer = document.getElementById('app-container');
+        const loginContainer = document.getElementById('login-container');
+        
+        if (loginContainer) loginContainer.style.display = 'none';
+        if (appContainer) appContainer.style.display = 'block';
+    }
+    
+    /**
+     * Inicia la app (después de login exitoso)
+     */
+    startApp() {
+        console.log('Iniciando app con usuario:', currentUser?.displayName);
         
         // Vincular eventos de los componentes
         this.bindComponentEvents();
         
         // Cargar datos iniciales
         this.loadTransactions();
+        
+        // Mostrar botón de logout
+        this.updateLogoutButton();
+    }
+    
+    /**
+     * Actualiza el botón de logout
+     */
+    updateLogoutButton() {
+        const logoutBtn = document.getElementById('logout-btn');
+        if (logoutBtn && currentUser) {
+            logoutBtn.style.display = 'inline-block';
+            logoutBtn.onclick = async () => {
+                await window.FirebaseAuth.logout();
+            };
+            
+            // Mostrar nombre del usuario
+            const userNameEl = document.getElementById('user-name');
+            if (userNameEl) userNameEl.textContent = currentUser.displayName;
+            
+            const userPhotoEl = document.getElementById('user-photo');
+            console.log('photoURL:', currentUser.photoURL);
+            console.log('displayName:', currentUser.displayName);
+            console.log('userPhotoEl existe:', !!userPhotoEl);
+            
+            if (userPhotoEl && currentUser.photoURL) {
+                // Crear una imagen con las iniciales como backup
+                const initials = currentUser.displayName.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
+                
+                // Probar cargar la imagen
+                const img = new Image();
+                img.onload = () => {
+                    userPhotoEl.src = currentUser.photoURL;
+                    console.log('Foto cargada OK');
+                };
+                img.onerror = () => {
+                    // Si falla, mostrar las iniciales
+                    console.log('Foto no cargos, mostrando iniciales:', initials);
+                    userPhotoEl.alt = initials;
+                    userPhotoEl.title = currentUser.displayName;
+                };
+                img.src = currentUser.photoURL;
+                
+            } else {
+                console.log('Sin photoURL o elemento no existe');
+            }
+        }
     }
     
     /**

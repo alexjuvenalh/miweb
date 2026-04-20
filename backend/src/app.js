@@ -6,6 +6,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 
 // Importar middlewares
 const requestLogger = require('./middlewares/logger');
@@ -40,6 +41,13 @@ app.use(express.json());
 
 // Logger de requests HTTP
 app.use(requestLogger);
+
+// ============================================================
+// STATIC FILES
+// ============================================================
+
+// Servir archivos estáticos (frontend)
+app.use(express.static(path.join(__dirname, '../../')));
 
 // ============================================================
 // ROUTES
