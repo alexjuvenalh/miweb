@@ -123,6 +123,22 @@ function logout() {
     }
 }
 
+// Obtener JWT token del usuario actual
+// Necesario para autenticar requests al backend
+async function getIdToken() {
+    if (!auth || !auth.currentUser) {
+        throw new Error('No hay usuario autenticado');
+    }
+    
+    try {
+        const token = await auth.currentUser.getIdToken();
+        return token;
+    } catch (e) {
+        console.error('Error al obtener token:', e);
+        throw e;
+    }
+}
+
 // Obtener usuario actual
 function getCurrentUser() {
     return auth ? auth.currentUser : null;
@@ -200,6 +216,7 @@ window.FirebaseAuth = {
     init: initFirebase,
     loginWithGoogle,
     logout,
+    getIdToken,
     getCurrentUser,
     onAuthStateChanged,
     checkRedirectResult,

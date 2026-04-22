@@ -1,9 +1,34 @@
 /**
  * Módulo de API para transacciones
- * Maneja todas las llamadas HTTP al backend
+ * Maneja todas las llamadas HTTP al backend con autenticación Firebase
  */
 
 const API_URL = 'http://localhost:3000/api/transactions';
+
+/**
+ * Obtiene el token JWT del usuario actual
+ * @returns {Promise<string>} Token JWT
+ */
+async function getAuthToken() {
+    // Usar FirebaseAuth del frontend
+    if (window.FirebaseAuth && window.FirebaseAuth.getIdToken) {
+        return await window.FirebaseAuth.getIdToken();
+    }
+    
+    throw new Error('FirebaseAuth no disponible. Debes iniciar sesión primero.');
+}
+
+/**
+ * Headers base con autenticación
+ * @returns {Promise<Object>} Headers con Authorization Bearer
+ */
+async function getAuthHeaders() {
+    const token = await getAuthToken();
+    return {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+    };
+}
 
 /**
  * Obtiene todas las transacciones con filtros opcionales
@@ -21,7 +46,8 @@ const getTransactions = async (filters = {}) => {
             url += `?${params.toString()}`;
         }
         
-        const response = await fetch(url);
+        const headers = await getAuthHeaders();
+        const response = await fetch(url, { headers });
         
         if (!response.ok) {
             const error = await response.json();
@@ -42,7 +68,8 @@ const getTransactions = async (filters = {}) => {
  */
 const getTransaction = async (id) => {
     try {
-        const response = await fetch(`${API_URL}/${id}`);
+        const headers = await getAuthHeaders();
+        const response = await fetch(`${API_URL}/${id}`, { headers });
         
         if (!response.ok) {
             const error = await response.json();
@@ -63,9 +90,10 @@ const getTransaction = async (id) => {
  */
 const createTransaction = async (data) => {
     try {
+        const headers = await getAuthHeaders();
         const response = await fetch(API_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers,
             body: JSON.stringify(data)
         });
         
@@ -92,9 +120,10 @@ const createTransaction = async (data) => {
  */
 const updateTransaction = async (id, data) => {
     try {
+        const headers = await getAuthHeaders();
         const response = await fetch(`${API_URL}/${id}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers,
             body: JSON.stringify(data)
         });
         
@@ -120,8 +149,10 @@ const updateTransaction = async (id, data) => {
  */
 const deleteTransaction = async (id) => {
     try {
+        const headers = await getAuthHeaders();
         const response = await fetch(`${API_URL}/${id}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers
         });
         
         if (!response.ok) {

@@ -8,9 +8,12 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 
+// Importar config
+const { initFirebaseAdmin } = require('./config/firebase');
+const { errorHandler, notFoundHandler, validateEnv } = require('./middlewares/errorHandler');
+
 // Importar middlewares
 const requestLogger = require('./middlewares/logger');
-const { errorHandler, notFoundHandler, validateEnv } = require('./middlewares/errorHandler');
 
 // Importar logger para uso en el archivo
 const logger = require('./utils/logger');
@@ -78,6 +81,14 @@ app.use(errorHandler);
 // ============================================================
 // SERVER START
 // ============================================================
+
+// Inicializar Firebase Admin (requiere credenciales configuradas)
+try {
+  initFirebaseAdmin();
+} catch (e) {
+  console.error('Error inicializando Firebase Admin:', e.message);
+  console.error('Las transacciones no funcionarán sin Firebase Admin configurado');
+}
 
 app.listen(port, () => {
     logger.success(`Servidor iniciado en puerto ${port}`);
