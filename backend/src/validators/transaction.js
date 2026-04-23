@@ -79,6 +79,35 @@ const filterSchema = Joi.object({
         .messages({
             'number.min': 'El ano debe ser valido',
             'number.max': 'El ano debe ser valido'
+        }),
+    page: Joi.number()
+        .integer()
+        .min(1)
+        .default(1)
+        .messages({
+            'number.integer': 'La pagina debe ser un numero entero',
+            'number.min': 'La pagina debe ser mayor a 0'
+        }),
+    limit: Joi.number()
+        .integer()
+        .min(1)
+        .max(100)
+        .default(20)
+        .messages({
+            'number.integer': 'El limite debe ser un numero entero',
+            'number.max': 'El limite no puede exceder 100'
+        }),
+    sortBy: Joi.string()
+        .valid('created_at', 'amount', 'type')
+        .default('created_at')
+        .messages({
+            'any.only': 'El campo de ordenamiento no es valido'
+        }),
+    sortOrder: Joi.string()
+        .valid('ASC', 'DESC')
+        .default('DESC')
+        .messages({
+            'any.only': 'El orden debe ser ASC o DESC'
         })
 });
 

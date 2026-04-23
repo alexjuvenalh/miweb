@@ -30,36 +30,66 @@ router.use(authenticate);
 // ============================================================
 // GET /api/transactions
 // Obtiene todas las transacciones del usuario actual con filtros opcionales por mes/año
+// Soporta paginación: ?page=1&limit=20&sortBy=created_at&sortOrder=DESC
 // ============================================================
 router.get('/', validateQuery(filterSchema), async (req, res, next) => {
     try {
-        const { month, year } = req.validatedQuery;
+        const { month, year, page, limit, sortBy, sortOrder } = req.validatedQuery;
         
         log.info('Obteniendo transacciones del usuario', { 
             userId: req.userId,
-            filters: { month, year } 
+            filters: { month, year, page, limit, sortBy, sortOrder } 
         });
         
+        // Calcular offset para paginación
+        const offset = (page - 1) * limit;
+        
+        // Construir query base
         let query = 'SELECT * FROM transactions WHERE user_id = $1';
         const params = [req.userId];
+        let paramIndex = 2;
 
         if (month && year) {
-            query += ' AND EXTRACT(MONTH FROM created_at) = $2 AND EXTRACT(YEAR FROM created_at) = $3';
+            query += ` AND EXTRACT(MONTH FROM created_at) = $${paramIndex} AND EXTRACT(YEAR FROM created_at) = $${paramIndex + 1}`;
             params.push(month, year);
+            paramIndex += 2;
         } else if (month) {
-            query += ' AND EXTRACT(MONTH FROM created_at) = $2';
+            query += ` AND EXTRACT(MONTH FROM created_at) = $${paramIndex}`;
             params.push(month);
+            paramIndex++;
         } else if (year) {
-            query += ' AND EXTRACT(YEAR FROM created_at) = $2';
+            query += ` AND EXTRACT(YEAR FROM created_at) = $${paramIndex}`;
             params.push(year);
+            paramIndex++;
         }
 
-        query += ' ORDER BY created_at DESC';
+        // Query para obtener total de registros (sin paginación)
+        const countQuery = query.replace('SELECT *', 'SELECT COUNT(*) as total');
+        const countResult = await db.query(countQuery, params);
+        const total = parseInt(countResult.rows[0].total, 10);
+
+        // Agregar ordenamiento y paginación
+        query += ` ORDER BY ${sortBy} ${sortOrder}`;
+        query += ` LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
+        params.push(limit, offset);
         
         const result = await db.query(query, params);
         
-        log.info(`Transacciones encontradas para usuario ${req.userId}: ${result.rows.length}`);
-        res.json(result.rows);
+        // Calcular meta información de paginación
+        const totalPages = Math.ceil(total / limit);
+        
+        log.info(`Transacciones encontradas para usuario ${req.userId}: ${result.rows.length} de ${total}`);
+        res.json({
+            data: result.rows,
+            pagination: {
+                page,
+                limit,
+                total,
+                totalPages,
+                hasNextPage: page < totalPages,
+                hasPrevPage: page > 1
+            }
+        });
     } catch (err) {
         log.error('Error al obtener transacciones', { error: err.message });
         next(Errors.DATABASE_ERROR('Error al consultar transacciones'));

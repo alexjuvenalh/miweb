@@ -224,7 +224,12 @@ showLogin() {
             if (!filters) {
                 filters = this.filters.getFilters();
             }
-            const transactions = await api.getTransactions(filters);
+            const response = await api.getTransactions(filters);
+            
+            // La API ahora retorna { data: [...], pagination: {...} }
+            // Extraer el array de transacciones
+            const transactions = response.data || response;
+            
             store.setState({ transactions, loading: false });
             this.updateUI();
         } catch (err) {

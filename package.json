@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Aplicacion de control financiero personal",
   "main": "backend/src/app.js",
-"scripts": {
+  "scripts": {
     "start": "node backend/src/app.js",
     "dev": "node backend/src/app.js",
     "test": "jest --config jest.config.json",
@@ -32,6 +32,7 @@
     "cors": "^2.8.6",
     "dotenv": "^17.4.1",
     "express": "^5.2.1",
+    "express-rate-limit": "^8.4.0",
     "firebase-admin": "^13.2.0",
     "joi": "^17.13.3",
     "pg": "^8.20.0"
