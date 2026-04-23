@@ -1,0 +1,20 @@
+{
+  "testEnvironment": "node",
+  "coverageDirectory": "coverage",
+  "collectCoverageFrom": [
+    "backend/src/**/*.js",
+    "!backend/src/config/firebase.js"
+  ],
+  "testMatch": [
+    "**/__tests__/**/*.js",
+    "**/*.test.js"
+  ],
+  "setupFilesAfterEnv": [
+    "<rootDir>/test/setup.js"
+  ],
+  "rootDir": "D:/Archivos/OneDrive - Autoridad Nacional del Agua/Programacion/IA/Gemini/Financiero",
+  "verbose": true,
+  "forceExit": true,
+  "clearMocks": true,
+  "restoreMocks": true
+}

@@ -3,11 +3,14 @@
   "version": "1.0.0",
   "description": "Aplicacion de control financiero personal",
   "main": "backend/src/app.js",
-  "scripts": {
+"scripts": {
     "start": "node backend/src/app.js",
     "dev": "node backend/src/app.js",
-    "test": "echo \"No tests yet\" && exit 0",
-    "migrate": "psql -U postgres -d control_financiero -f migrations/001_create_transactions.sql"
+    "test": "jest --config jest.config.json",
+    "test:watch": "jest --config jest.config.json --watch",
+    "test:coverage": "jest --config jest.config.json --coverage",
+    "test:frontend": "jest --config frontend/jest.config.json",
+    "test:all": "jest --config jest.config.json && jest --config frontend/jest.config.json"
   },
   "repository": {
     "type": "git",
