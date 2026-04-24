@@ -142,14 +142,14 @@ CONSTRAINT expense_needs_type CHECK (
                 NEW.updated_at = CURRENT_TIMESTAMP;
                 RETURN NEW;
             END;
-            $$ language 'plpgsql';
+            $$ language 'plpgsql'
         `);
         await query(`DROP TRIGGER IF EXISTS update_transactions_updated_at ON transactions`);
         await query(`
             CREATE TRIGGER update_transactions_updated_at
             BEFORE UPDATE ON transactions
             FOR EACH ROW
-            EXECUTE FUNCTION update_updated_at_column()
+            EXECUTE FUNCTION update_updated_at_column();
         `);
         
         // Tabla users
