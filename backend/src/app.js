@@ -99,6 +99,79 @@ app.get('/health', (req, res) => {
     });
 });
 
+// Endpoint de migraciones (temporal - ejecutar una vez y desactivar)
+app.get('/api/migrate', async (req, res) => {
+    try {
+        const { query } = require('./config/database');
+        
+        // Migration 001: Crear tabla transactions
+        await query(`
+            CREATE TABLE IF NOT EXISTS transactions (
+                id SERIAL PRIMARY KEY,
+                type VARCHAR(20) NOT NULL CHECK (type IN ('income', 'expense')),
+                description TEXT NOT NULL CHECK (char_length(description) >= 1 AND char_length(description) <= 500),
+                category VARCHAR(100),
+                amount DECIMAL(10, 2) NOT NULL CHECK (amount > 0 AND amount <= 1000000),
+                expense_type VARCHAR(50) CHECK (expense_type IN ('variable', 'fijo')),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                user_id VARCHAR(255) NOT NULL DEFAULT 'default_user',
+                CONSTRAINT expense_needs_category CHECK (
+                    (type = 'income' AND category IS NULL) OR
+                    (type = 'expense' AND category IS NOT NULL)
+                ),
+                CONSTRAINT expense_needs_type CHECK (
+                    (type = 'income' AND expense_type IS NULL) OR
+                    (type = 'expense' AND expense_type IS NOT NULL)
+                )
+            )
+        `);
+        
+        // Índices
+        await query(`CREATE INDEX IF NOT EXISTS idx_transactions_created_at ON transactions(created_at DESC)`);
+        await query(`CREATE INDEX IF NOT EXISTS idx_transactions_type ON transactions(type)`);
+        await query(`CREATE INDEX IF NOT EXISTS idx_transactions_category ON transactions(category)`);
+        await query(`CREATE INDEX IF NOT EXISTS idx_transactions_user_id ON transactions(user_id)`);
+        await query(`CREATE INDEX IF NOT EXISTS idx_transactions_user_created_at ON transactions(user_id, created_at DESC)`);
+        
+        // Trigger para updated_at
+        await query(`
+            CREATE OR REPLACE FUNCTION update_updated_at_column()
+            RETURNS TRIGGER AS $$
+            BEGIN
+                NEW.updated_at = CURRENT_TIMESTAMP;
+                RETURN NEW;
+            END;
+            $$ language 'plpgsql'
+        `);
+        await query(`DROP TRIGGER IF EXISTS update_transactions_updated_at ON transactions`);
+        await query(`
+            CREATE TRIGGER update_transactions_updated_at
+            BEFORE UPDATE ON transactions
+            FOR EACH ROW
+            EXECUTE FUNCTION update_updated_at_column()
+        `);
+        
+        // Tabla users
+        await query(`
+            CREATE TABLE IF NOT EXISTS users (
+                uid VARCHAR(255) PRIMARY KEY,
+                email VARCHAR(255) UNIQUE NOT NULL,
+                display_name VARCHAR(255),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                last_login_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                is_active BOOLEAN DEFAULT TRUE NOT NULL
+            )
+        `);
+        await query(`CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)`);
+        
+        res.json({ status: 'ok', message: 'Migraciones ejecutadas correctamente' });
+    } catch (error) {
+        logger.error('Error en migraciones', { error: error.message });
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Rutas de la API con rate limiting
 app.use('/api/transactions', generalLimiter, transactionsRouter);
 

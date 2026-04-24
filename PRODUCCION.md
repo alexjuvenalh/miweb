@@ -62,15 +62,13 @@ El proyecto "Control Financiero" es una app de gestión de finanzas personales c
 
 ## Servicios Recomendados para Publicar
 
-| Servicio | SSL | DB included | Precio |
-|----------|-----|--------------|--------|
-| **Vercel** | ✅ Auto | ❌ Externo | Free |
-| **Railway** | ✅ Auto | ✅ PostgreSQL | $5/mes |
-| **Heroku** | ✅ Auto | ✅ PostgreSQL | Free tier |
-| **Render** | ✅ Auto | ✅ PostgreSQL | Free tier |
-
-### Recomendado para este proyecto:
-**Railway** — Tiene PostgreSQL incluido, fácil setup, $5/mes
+| Servicio | SSL | DB included | Custom Domain | Precio | Notas |
+|----------|-----|--------------|--------------|--------|-------|
+| **Seenode** | ✅ Auto | ✅ PostgreSQL | Coming Soon | $17/mes | 7-day free trial (sin tarjeta)
+| **Vercel** | ✅ Auto | ❌ Externo | ✅ | Free | -
+| **Railway** | ✅ Auto | ✅ PostgreSQL | ✅ | $5/mes | - |
+| **Heroku** | ✅ Auto | ✅ PostgreSQL | ✅ | Free tier | - |
+| **Render** | ✅ Auto | ✅ PostgreSQL | ✅ | Free tier | - |
 
 ---
 
