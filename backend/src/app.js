@@ -124,15 +124,15 @@ app.get('/api/migrate', async (req, res) => {
                     (type = 'income' AND expense_type IS NULL) OR
                     (type = 'expense' AND expense_type IS NOT NULL)
                 )
-            );
+            )
         `);
         
         // Índices
-        await query(`CREATE INDEX IF NOT EXISTS idx_transactions_created_at ON transactions(created_at DESC);`);
-        await query(`CREATE INDEX IF NOT EXISTS idx_transactions_type ON transactions(type);`);
-        await query(`CREATE INDEX IF NOT EXISTS idx_transactions_category ON transactions(category);`);
-        await query(`CREATE INDEX IF NOT EXISTS idx_transactions_user_id ON transactions(user_id);`);
-        await query(`CREATE INDEX IF NOT EXISTS idx_transactions_user_created_at ON transactions(user_id, created_at DESC);`);
+        await query(`CREATE INDEX IF NOT EXISTS idx_transactions_created_at ON transactions(created_at DESC)`);
+        await query(`CREATE INDEX IF NOT EXISTS idx_transactions_type ON transactions(type)`);
+        await query(`CREATE INDEX IF NOT EXISTS idx_transactions_category ON transactions(category)`);
+        await query(`CREATE INDEX IF NOT EXISTS idx_transactions_user_id ON transactions(user_id)`);
+        await query(`CREATE INDEX IF NOT EXISTS idx_transactions_user_created_at ON transactions(user_id, created_at DESC)`);
         
         // Trigger para updated_at
         await query(`
@@ -161,9 +161,9 @@ app.get('/api/migrate', async (req, res) => {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
                 last_login_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
                 is_active BOOLEAN DEFAULT TRUE NOT NULL
-            );
+            )
         `);
-        await query(`CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);`);
+        await query(`CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)`);
         
         res.json({ status: 'ok', message: 'Migraciones ejecutadas correctamente' });
     } catch (error) {
