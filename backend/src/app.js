@@ -120,11 +120,11 @@ app.get('/api/migrate', async (req, res) => {
                     (type = 'income' AND category IS NULL) OR
                     (type = 'expense' AND category IS NOT NULL)
                 ),
-                CONSTRAINT expense_needs_type CHECK (
+CONSTRAINT expense_needs_type CHECK (
                     (type = 'income' AND expense_type IS NULL) OR
                     (type = 'expense' AND expense_type IS NOT NULL)
                 )
-            )
+            );
         `);
         
         // Índices
@@ -142,7 +142,7 @@ app.get('/api/migrate', async (req, res) => {
                 NEW.updated_at = CURRENT_TIMESTAMP;
                 RETURN NEW;
             END;
-            $$ language 'plpgsql'
+            $$ language 'plpgsql';
         `);
         await query(`DROP TRIGGER IF EXISTS update_transactions_updated_at ON transactions`);
         await query(`
