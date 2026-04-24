@@ -143,11 +143,9 @@ const notFoundHandler = (req, res, next) => {
  * Resalta errores sin mostrar stack trace en producción
  */
 const validateEnv = () => {
-    // En producción (NODE_ENV=production), no validar required vars
-    // porque pueden venir de otras fuentes (como query params en migrate)
-    if (process.env.NODE_ENV === 'production') {
-        return;
-    }
+    // Desactivado temporalmente para seenode que no tiene env vars configurables
+    // TODO: Volver a activar cuando seenode soporte env vars
+    return;
     
     const required = ['DB_USER', 'DB_HOST', 'DB_DATABASE', 'DB_PASSWORD', 'DB_PORT'];
     const missing = required.filter(key => !process.env[key]);
