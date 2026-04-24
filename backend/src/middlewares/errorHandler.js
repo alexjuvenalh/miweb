@@ -143,19 +143,8 @@ const notFoundHandler = (req, res, next) => {
  * Resalta errores sin mostrar stack trace en producción
  */
 const validateEnv = () => {
-    // Desactivado temporalmente para seenode que no tiene env vars configurables
-    // TODO: Volver a activar cuando seenode soporte env vars
+    // Desactivado para seenode que no tiene env vars configurables
     return;
-    
-    const required = ['DB_USER', 'DB_HOST', 'DB_DATABASE', 'DB_PASSWORD', 'DB_PORT'];
-    const missing = required.filter(key => !process.env[key]);
-    
-    if (missing.length > 0) {
-        logger.error('Variables de entorno faltantes', { missing });
-        throw new Error(`Faltan variables de entorno: ${missing.join(', ')}`);
-    }
-    
-    logger.success('Configuración de entorno validada');
 };
 
 module.exports = {
