@@ -100,9 +100,24 @@ app.get('/health', (req, res) => {
 });
 
 // Endpoint de migraciones (temporal - ejecutar una vez y desactivar)
+// Acepta credenciales como query params para entornos sin env vars
 app.get('/api/migrate', async (req, res) => {
     try {
-        const { query } = require('./config/database');
+        // Si no hay env vars, usar las pasadas como query params o las de seenode
+        const dbConfig = {
+            user: process.env.DB_USER || req.query.db_user || 'db_dl2imxnx7bds',
+            host: process.env.DB_HOST || req.query.db_host || 'up-de-fra1-postgresql-2.db.run-on-seenode.com',
+            database: process.env.DB_DATABASE || req.query.db_database || 'db_dl2imxnx7bds',
+            password: process.env.DB_PASSWORD || req.query.db_password || 'ryoT58AfgFeotA8EjNRz2Shq',
+            port: parseInt(process.env.DB_PORT) || parseInt(req.query.db_port) || 11550
+        };
+        
+        const { Pool } = require('pg');
+        const pool = new Pool(dbConfig);
+        const query = async (text) => {
+            const result = await pool.query(text);
+            return result;
+        };
         
         // Migration 001: Crear tabla transactions
         await query(`
@@ -166,6 +181,9 @@ CONSTRAINT expense_needs_type CHECK (
         await query(`CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)`);
         
         res.json({ status: 'ok', message: 'Migraciones ejecutadas correctamente' });
+        
+        // Cerrar pool temporal
+        await pool.end();
     } catch (error) {
         logger.error('Error en migraciones', { error: error.message });
         res.status(500).json({ error: error.message });
