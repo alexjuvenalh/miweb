@@ -128,11 +128,11 @@ app.get('/api/migrate', async (req, res) => {
         `);
         
         // Índices
-        await query(`CREATE INDEX IF NOT EXISTS idx_transactions_created_at ON transactions(created_at DESC)`);
-        await query(`CREATE INDEX IF NOT EXISTS idx_transactions_type ON transactions(type)`);
-        await query(`CREATE INDEX IF NOT EXISTS idx_transactions_category ON transactions(category)`);
-        await query(`CREATE INDEX IF NOT EXISTS idx_transactions_user_id ON transactions(user_id)`);
-        await query(`CREATE INDEX IF NOT EXISTS idx_transactions_user_created_at ON transactions(user_id, created_at DESC)`);
+        await query(`CREATE INDEX IF NOT EXISTS idx_transactions_created_at ON transactions(created_at DESC);`);
+        await query(`CREATE INDEX IF NOT EXISTS idx_transactions_type ON transactions(type);`);
+        await query(`CREATE INDEX IF NOT EXISTS idx_transactions_category ON transactions(category);`);
+        await query(`CREATE INDEX IF NOT EXISTS idx_transactions_user_id ON transactions(user_id);`);
+        await query(`CREATE INDEX IF NOT EXISTS idx_transactions_user_created_at ON transactions(user_id, created_at DESC);`);
         
         // Trigger para updated_at
         await query(`
@@ -142,14 +142,14 @@ app.get('/api/migrate', async (req, res) => {
                 NEW.updated_at = CURRENT_TIMESTAMP;
                 RETURN NEW;
             END;
-            $$ language 'plpgsql';
+            $$ language 'plpgsql'
         `);
-        await query(`DROP TRIGGER IF EXISTS update_transactions_updated_at ON transactions;`);
+        await query(`DROP TRIGGER IF EXISTS update_transactions_updated_at ON transactions`);
         await query(`
             CREATE TRIGGER update_transactions_updated_at
             BEFORE UPDATE ON transactions
             FOR EACH ROW
-            EXECUTE FUNCTION update_updated_at_column();
+            EXECUTE FUNCTION update_updated_at_column()
         `);
         
         // Tabla users
@@ -163,7 +163,7 @@ app.get('/api/migrate', async (req, res) => {
                 is_active BOOLEAN DEFAULT TRUE NOT NULL
             );
         `);
-        await query(`CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)`);
+        await query(`CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);`);
         
         res.json({ status: 'ok', message: 'Migraciones ejecutadas correctamente' });
     } catch (error) {
