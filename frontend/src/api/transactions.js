@@ -3,7 +3,18 @@
  * Maneja todas las llamadas HTTP al backend con autenticación Firebase
  */
 
-const API_URL = 'http://localhost:3000/api/transactions';
+// URL del backend - se detecta automáticamente según el dominio actual
+const getApiBaseUrl = () => {
+    const hostname = window.location.hostname;
+    // Si es localhost, usar localhost:3000
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        return 'http://localhost:3000/api';
+    }
+    // En producción, usar el mismo dominio + /api
+    return `${window.location.origin}/api`;
+};
+
+const API_URL = `${getApiBaseUrl()}/transactions`;
 
 /**
  * Obtiene el token JWT del usuario actual
