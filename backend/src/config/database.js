@@ -9,14 +9,28 @@ const logger = require('../utils/logger');
 
 const log = logger.createLogger('Database');
 
+// Credenciales hardcodeadas para Seenode (producción)
+const seenodeDbConfig = {
+    user: 'db_dl2imxnx7bds',
+    host: 'up-de-fra1-postgresql-2.db.run-on-seenode.com',
+    database: 'db_dl2imxnx7bds',
+    password: 'ryoT58AfgFeotA8EjNRz2Shq',
+    port: 11550
+};
+
+// Usar env vars si existen, si no usar credenciales hardcodeadas
+const dbConfig = {
+    user: process.env.DB_USER || seenodeDbConfig.user,
+    host: process.env.DB_HOST || seenodeDbConfig.host,
+    database: process.env.DB_DATABASE || seenodeDbConfig.database,
+    password: process.env.DB_PASSWORD || seenodeDbConfig.password,
+    port: parseInt(process.env.DB_PORT) || seenodeDbConfig.port,
+    ssl: { rejectUnauthorized: false }  // SSL requerido por Seenode
+};
+
 // Configuración del pool de conexiones
 const pool = new Pool({
-    user: process.env.DB_USER,
-    host: process.env.DB_HOST,
-    database: process.env.DB_DATABASE,
-    password: process.env.DB_PASSWORD,
-    port: process.env.DB_PORT,
-    ssl: { rejectUnauthorized: false },  // SSL requerido por Seenode
+    ...dbConfig,
     
     // Configuración del pool
     max: 20,                      // Máximo 20 conexiones simultáneas
