@@ -109,7 +109,8 @@ app.get('/api/migrate', async (req, res) => {
             host: process.env.DB_HOST || req.query.db_host || 'up-de-fra1-postgresql-2.db.run-on-seenode.com',
             database: process.env.DB_DATABASE || req.query.db_database || 'db_dl2imxnx7bds',
             password: process.env.DB_PASSWORD || req.query.db_password || 'ryoT58AfgFeotA8EjNRz2Shq',
-            port: parseInt(process.env.DB_PORT) || parseInt(req.query.db_port) || 11550
+            port: parseInt(process.env.DB_PORT) || parseInt(req.query.db_port) || 11550,
+            ssl: { rejectUnauthorized: false }  // SSL requerido por Seenode
         };
         
         const { Pool } = require('pg');

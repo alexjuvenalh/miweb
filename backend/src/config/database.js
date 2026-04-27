@@ -16,6 +16,7 @@ const pool = new Pool({
     database: process.env.DB_DATABASE,
     password: process.env.DB_PASSWORD,
     port: process.env.DB_PORT,
+    ssl: { rejectUnauthorized: false },  // SSL requerido por Seenode
     
     // Configuración del pool
     max: 20,                      // Máximo 20 conexiones simultáneas
